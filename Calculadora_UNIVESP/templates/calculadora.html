@@ -1,0 +1,548 @@
+<!--  Calculadora de Média de Notas -->
+<!--  Desenvolvido por Sergio Eric - 1ª Versão - 09/03/2024 -->
+
+
+<!-- Esse código HTML é uma calculadora de média de notas que permite calcular tanto a média das avaliativas -->
+<!-- quanto a média final com base nas notas das avaliativas e da prova. Ele inclui formulários para inserir as -->
+<!-- notas das avaliativas e da prova, bem como botões para calcular as médias correspondentes. -->
+
+<!-- A estrutura do código inclui: -->
+
+<!-- - Um formulário para inserir as notas das avaliativas, onde cada nota tem um peso específico. -->
+<!-- - Um botão para calcular a média das avaliativas. -->
+<!-- - Uma seção para exibir o resultado da média das avaliativas. -->
+<!-- - Um segundo formulário para inserir a nota da prova. -->
+<!-- - Um botão para calcular a média final com base na média das avaliativas e na nota da prova. -->
+<!-- - Uma seção para exibir o resultado da média final e uma mensagem indicando se o aluno foi aprovado ou -->
+<!--   reprovado na disciplina, e, em caso de reprovação, qual a nota necessária no exame para ser aprovado. -->
+
+<!-- Além disso, há dois popup's que fornecem tutoriais sobre como calcular a média das avaliativas e a média final. -->
+
+
+<!-- 
+    O DOCTYPE HTML5 especifica a versão do HTML que o navegador deve renderizar.
+    Neste caso, está definido como HTML5, a versão mais recente e amplamente suportada.
+    Isso garante que o navegador interprete corretamente o código HTML presente no documento.
+-->
+<!DOCTYPE html>
+
+
+
+<!-- 
+    A declaração 'html lang="pt-br"' especifica o idioma principal do documento como Português Brasileiro.
+    Isso é relevante para acessibilidade e SEO, indicando aos navegadores e motores de busca o idioma predominante
+    do conteúdo. Certificar-se de definir corretamente o idioma é uma prática recomendada para melhorar a experiência
+    do usuário e a indexação do conteúdo pelos motores de busca.
+-->
+<html lang="pt-br">
+
+
+
+<head>
+
+    
+<script>
+
+       
+    // Nestes bloco de códigos deste script, 7 eventos são adicionados, para cada nota de avaliativa, para responder no //
+    // momento em que o DOM está  completamente carregado. 
+    // 7 Ouvintes de eventos, um para cada nota, é também adicionado ao elemento com o ID "notaX", onde X vai de 1 a 7//
+    // respondendo ao evento "input". Quando o valor da "notaX" é alterado, o script calcula o resultado // 
+    // multiplicando a nota pelo peso correspondente, formata o resultado com duas casas decimais e exibe o //
+    //resultado no elemento com o ID "resultado_notaX". Este código é parte de uma calculadora de média de notas.//
+
+   // Os comentários acima fornecem uma visão geral do que cada bloco de código está fazendo. //
+   // Eles indicam que cada bloco adiciona um ouvinte de eventos a um elemento específico //
+   // ("nota1", "nota2", ..., "nota7") para responder ao evento "input" quando o valor da//
+   // nota correspondente é alterado. O script, então, realiza cálculos com base na//
+    // nota e no peso atribuído a essa nota, formata o resultado e exibe-o em um elemento específico. //
+    // Esses scripts são replicados para cada uma das sete notas avaliativas.//
+
+
+
+    // Função para adicionar ouvinte a uma nota
+    function adicionarOuvinte(notaId, resultadoId, peso) {
+        
+        var notaInput = document.getElementById(notaId);
+        var resultadoSpan = document.getElementById(resultadoId);
+
+        notaInput.addEventListener("input", function () {
+            validarNota(notaId); // Validar a nota inserida
+
+            var nota = parseFloat(this.value);
+            var resultado = (nota * peso).toFixed(2); // Calcula o resultado
+            resultadoSpan.innerText = nota + " x " + (peso * 100) + "% = " + resultado; // Exibe o resultado
+        
+        });
+    }
+
+    // Configuração dos ouvintes para cada nota
+    document.addEventListener("DOMContentLoaded", function () {
+        adicionarOuvinte("nota1", "resultado_nota1", 0.08);
+        adicionarOuvinte("nota2", "resultado_nota2", 0.12);
+        adicionarOuvinte("nota3", "resultado_nota3", 0.17);
+        adicionarOuvinte("nota4", "resultado_nota4", 0.17);
+        adicionarOuvinte("nota5", "resultado_nota5", 0.17);
+        adicionarOuvinte("nota6", "resultado_nota6", 0.17);
+        adicionarOuvinte("nota7", "resultado_nota7", 0.12);
+    });
+
+</script>
+
+<script>
+    // Verifique se há um contador de visualizações armazenado localmente
+    var views = localStorage.getItem('views');
+
+    // Se não houver um contador de visualizações, inicialize-o como 1
+    if (!views) {
+        views = 1;
+    } else {
+        // Se houver, converta-o para um número
+        views = parseInt(views);
+        // Incremente-o em 1
+        views++;
+    }
+
+    // Atualize o contador de visualizações na página
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('views').textContent = views;
+    });
+
+    // Armazene o novo valor do contador de visualizações no armazenamento local
+    localStorage.setItem('views', views.toString());
+</script>
+
+
+<script>
+    function alterarTamanhoFonte(tamanho) {
+        var elementoBody = document.body;
+
+        switch (tamanho) {
+            case 'P':
+                elementoBody.style.fontSize = '12px';
+                break;
+            case 'M':
+                elementoBody.style.fontSize = '16px';
+                break;
+            case 'G':
+                elementoBody.style.fontSize = '20px';
+                break;
+            default:
+                // Se um tamanho inválido for fornecido, você pode definir um tamanho padrão
+                elementoBody.style.fontSize = '16px';
+        }
+    }
+</script>
+
+<!-- Adicione este script à sua seção <script> no head ou no final do body -->
+    <script>
+        // Função para adicionar um "escutador" a um campo de nota
+        function adicionarEscutadorNota(notaId) {
+            document.getElementById(notaId).addEventListener("input", function () {
+                var nota = parseFloat(this.value);
+                
+                if (nota < 0 || nota > 10) {
+                    var alertMessage = "Digite um valor válido, entre 0 e 10!";
+                    mostrarAlerta(alertMessage);
+                } else {
+                    removerAlerta();
+                }
+            });
+        }
+    
+        // Adicione um "escutador" para cada campo de nota
+        document.addEventListener("DOMContentLoaded", function () {
+            adicionarEscutadorNota("nota1");
+            adicionarEscutadorNota("nota2");
+            adicionarEscutadorNota("nota3");
+            adicionarEscutadorNota("nota4");
+            adicionarEscutadorNota("nota5");
+            adicionarEscutadorNota("nota6");
+            adicionarEscutadorNota("nota7");
+            adicionarEscutadorNota("notaProva");
+        });
+    
+        // Função para mostrar o alerta estilizado no centro horizontal e no topo vertical da página
+        function mostrarAlerta(message) {
+            var popup = document.createElement("div");
+            popup.id = "alertPopup";
+            popup.innerHTML = "<span style='color: red; font-weight: bold; font-size: 20px; animation: blink 0.5s infinite;'>" + message + "</span>";
+            popup.style.position = "fixed";
+            popup.style.top = "20px";  // Ajuste a distância do topo conforme necessário
+            popup.style.left = "50%";
+            popup.style.transform = "translateX(-50%)";
+            popup.style.padding = "20px";
+            popup.style.backgroundColor = "yellow";
+            popup.style.border = "2px solid red";
+            popup.style.borderRadius = "10px";
+            popup.style.zIndex = "1000";
+            document.body.appendChild(popup);
+        }
+    
+        // Função para remover o alerta
+        function removerAlerta() {
+            var alertPopup = document.getElementById("alertPopup");
+            if (alertPopup) {
+                alertPopup.remove();
+            }
+        }
+    </script>
+    
+    <script>
+        function validarNota(notaId) {
+            
+          
+
+            var notaInput = document.getElementById(notaId);
+            var nota = parseFloat(notaInput.value);
+    
+            if (isNaN(nota) || nota < 0 || nota > 10) {
+                notaInput.classList.add("campo-invalido");
+                notaInput.setCustomValidity("Por favor, insira uma nota válida entre 0 e 10.");
+            } else {
+                notaInput.classList.remove("campo-invalido");
+                notaInput.setCustomValidity("");
+            }
+
+            
+        }
+    </script>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Média de Notas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2b4399;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+        }
+
+        .conteudo {
+            max-width: 1000px;
+            background-color: #9fbfed;
+            padding: 20px;
+            border-radius: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #492bb5;
+        }
+
+        h3 {
+            color: #2e4999;
+        }
+
+
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 50px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"],
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 500px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover,
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .campo-invalido {
+            background-color: #e37c7c; /* Cor de fundo vermelha para destacar o campo inválido */
+            border-color: #dc3545; /* Cor da borda vermelha */
+        }
+
+
+
+        .info {
+            font-style: italic;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        /* Estilo do popup */
+        .popup {
+            position: absolute;
+            background-color: #f9f9f9;
+            border: 1px solid #0e0101;
+            padding: 15px;
+            z-index: 1;
+            display: none;
+            border-radius: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilo para campos com dados inválidos */
+        input:invalid {
+            border-color: rgb(171, 216, 87);
+        }
+        .resultado {
+            margin-top: 20px; /* Este valor de margem pode ser ajustado conforme necessário */
+        }
+        
+        @keyframes blink {
+            0% {
+                opacity: 1;
+                }
+            50% {
+                opacity: 0;
+                }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        input[type="number"] {
+            width: 10%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 50px;
+            box-sizing: border-box;
+            text-align: center; /* Adicione esta linha para centralizar o texto dentro da caixa */
+        }
+    </style>
+</head>
+<body>
+    <div class="conteudo" id="conteudo">
+        <h1>Calculadora de Média de Notas Bimestrais das Disciplinas de Graduação da </h1>
+        <footer>
+            <h1> <a href="https://www.univesp.br" target="_blank">UNIVESP - Universidade Virtual do Estado de São Paulo</a></h1>
+        </footer>
+        <h2>Desenvolvida em consonância com as regras dos cálculos disponibilizadas pela Universidade</h2>
+        <h4>Visualizações: <span id="views">0</span></h4>
+        <br>
+        <form id="formNotas" onsubmit="return calcularMedia()">
+            
+            <label for="nota1">Nota da Avaliativa da Semana 1 (Peso 8%):
+            <input type="number" id="nota1" name="nota1" min="0" max="10" step="0.01" required oninput="validarNota('nota1')">
+            <span id="resultado_nota1"></span> <!-- Aqui será exibido o resultado -->
+            </label>
+            
+
+            <label for="nota2">Nota da Avaliativa da Semana 2 (Peso 12%):
+            <input type="number" id="nota2" name="nota2" min="0" max="10" step="0.01" required oninput="validarNota('nota2')">
+            <span id="resultado_nota2"></span>
+            </label>
+
+            <label for="nota3">Nota da Avaliativa da Semana 3 (Peso 17%):
+            <input type="number" id="nota3" name="nota3" min="0" max="10" step="0.01" required oninput="validarNota('nota3')">
+            <span id="resultado_nota3"></span>
+            </label>
+
+            <label for="nota4">Nota da Avaliativa da Semana 4 (Peso 17%):
+            <input type="number" id="nota4" name="nota4" min="0" max="10" step="0.01" required oninput="validarNota('nota4')">
+            <span id="resultado_nota4"></span>
+            </label>
+
+            <label for="nota5">Nota da Avaliativa da Semana 5 (Peso 17%):
+            <input type="number" id="nota5" name="nota5" min="0" max="10" step="0.01" required oninput="validarNota('nota5')">
+            <span id="resultado_nota5"></span>
+            </label>
+
+            <label for="nota6">Nota da Avaliativa da Semana 6 (Peso 17%):
+            <input type="number" id="nota6" name="nota6" min="0" max="10" step="0.01" required oninput="validarNota('nota6')">
+            <span id="resultado_nota6"></span>
+            </label>
+
+            <label for="nota7">Nota da Avaliativa da Semana 7 (Peso 12%):
+            <input type="number" id="nota7" name="nota7" min="0" max="10" step="0.01" required oninput="validarNota('nota7')">
+            <span id="resultado_nota7"></span>
+            </label>
+
+            <p class="info">Para calcular a Média das Avaliativas, multiplique cada nota pelo seu respectivo peso e some os resultados. <a href="#" onmouseover="mostrarPopup(event, 'media-avaliativas')" onmouseout="ocultarPopup()">tutorial</a>.</p>
+
+            <input type="submit" value="Calcular Média das Avaliativas">
+        </form>
+
+        <br>
+        <div id="resultado1" class="resultado"></div>
+        <br>
+        <form id="formProva" onsubmit="return calcularMediaProva()">
+            <label for="notaProva">Nota da Prova:
+                <input type="number" id="notaProva" name="notaProva" min="0" max="10" step="0.01" required oninput="validarNota('notaProva')">
+            </label>
+
+            <p class="info">Para calcular a Média Final, some a Média das Avaliativas x 40%, com a Nota da Prova x 60%.<a href="#" onmouseover="mostrarPopup(event, 'media-final')" onmouseout="ocultarPopup()">tutorial</a></p>
+
+            <input type="submit" value="Calcular Média Final">
+        </form>
+
+        <div id="resultado2" class="resultado"></div>
+
+        <div class="info" id="mensagem">
+            <!-- Aqui será exibida a mensagem de aprovação ou reprovação -->
+        </div>
+
+        <button onclick="recarregarPagina()">Recarregar Página</button>
+
+        <h3>&copy;2024 - By Sergio Eric & ChatGPT</h3>
+        <footer>
+            <p>Instagram: <a href="https://www.instagram.com/prof_sergio_eric_matematica" target="_blank">@prof_sergio_eric_matematica</a></p>
+        </footer>
+        <h3>Aluno regularmente matriculado no curso de Licenciatura em Matemática da UNIVESP</h3>
+        <h3>1ª Versão - 09/03/2024</h3>
+        
+    </div>
+
+    
+
+    <!-- Popup -->
+    <div id="popup" class="popup">
+        <h2>Tutorial - Calculadora de Média de Notas</h2>
+        <g3>Desenvolvido por Sergio Eric - 1ª Versão - 09/03/2024</g3>
+        <div class="tutorial-section media-avaliativas">
+            <h3>Cálculo da Média das Avaliativas</h3>
+            <p>Para calcular a Média das Avaliativas, você precisa seguir estes passos:</p>
+            <ol>
+                <li>Multiplicar cada Nota da Avaliativa de cada semana pelo seu respectivo peso.</li>
+                <li>Os pesos das notas, a cada semana, são os seguintes:
+                    <ul>
+                        <li>Peso da Semana 1: 8%</li>
+                        <li>Peso da Semana 2: 12%</li>
+                        <li>Peso da Semana 3: 17%</li>
+                        <li>Peso da Semana 4: 17%</li>
+                        <li>Peso da Semana 5: 17%</li>
+                        <li>Peso da Semana 6: 17%</li>
+                        <li>Peso da Semana 7: 12%</li>
+                    </ul>
+                </li>
+                <li>Somar os resultados obtidos no passo anterior, para obter a Média das Avaliativas.</li>
+            </ol>
+        </div>
+
+        <div class="tutorial-section media-final">
+            <h3>Cálculo da Média Final</h3>
+            <p>Para calcular a média final, siga os passos abaixo:</p>
+            <ol>
+                <li>Calcule a Média das Avaliativas, conforme descrito na seção anterior.</li>
+                <li>Multiplicar a Média das Avaliativas por 40%.</li>
+                <li>Multiplicar a Nota da Prova por 60%.</li>
+                <li>Somar os resultados dos passos 2 e 3, desta seção.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Função para mostrar o popup
+        function mostrarPopup(event, section) {
+            event.preventDefault();
+            var popup = document.getElementById("popup");
+            popup.style.display = "block";
+            document.querySelectorAll('.tutorial-section').forEach(function(element) {
+                element.style.display = 'none';
+            });
+            document.querySelector('.' + section).style.display = 'block';
+        }
+
+        // Função para ocultar o popup
+        function ocultarPopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "none";
+        }
+
+        // Funções de cálculo de média e recarregar a página
+        function calcularMedia() {
+            var nota1 = parseFloat(document.getElementById("nota1").value);
+            var nota2 = parseFloat(document.getElementById("nota2").value);
+            var nota3 = parseFloat(document.getElementById("nota3").value);
+            var nota4 = parseFloat(document.getElementById("nota4").value);
+            var nota5 = parseFloat(document.getElementById("nota5").value);
+            var nota6 = parseFloat(document.getElementById("nota6").value);
+            var nota7 = parseFloat(document.getElementById("nota7").value);
+
+            if (nota1 < 0 || nota1 > 10 || nota2 < 0 || nota2 > 10 || nota3 < 0 || nota3 > 10 || nota4 < 0 || nota4 > 10 || nota5 < 0 || nota5 > 10 || nota6 < 0 || nota6 > 10 || nota7 < 0 || nota7 > 10) {
+                alert("Por favor, insira notas válidas entre 0 e 10.");
+                return false;
+            }
+
+            var media = nota1 * 0.08 + nota2 * 0.12 + nota3 * 0.17 + nota4 * 0.17 + nota5 * 0.17 + nota6 * 0.17 + nota7 * 0.12;
+            document.getElementById("resultado1").innerHTML = "<span class='resultado'>A Média das Avaliativas é: " + media.toFixed(2) + "</span>";
+
+            return false; // Impede o formulário de ser enviado
+        }
+
+        function calcularMediaProva() {
+            var notaProva = parseFloat(document.getElementById("notaProva").value);
+
+            if (notaProva < 0 || notaProva > 10) {
+                alert("Por favor, insira uma nota da prova válida entre 0 e 10.");
+                return false;
+            }
+
+            var mediaAvaliativa = parseFloat(document.getElementById("resultado1").innerHTML.split(": ")[1]);
+            var mediaFinal = mediaAvaliativa * 0.4 + notaProva * 0.6;
+           
+
+            document.getElementById("resultado2").innerHTML = "<span class='resultado'>A média final é igual a Média das Avaliativas x 40% + Nota da Prova x 60% = "  + mediaAvaliativa.toFixed(2) + " x 40% + " + notaProva.toFixed(2) + " x 60% = <b style='font-size: 110%;'>" + mediaFinal.toFixed(2) + "</b></span>";
+
+            var mensagem = document.getElementById("mensagem");
+            mensagem.style.fontSize = "18px"; // Tamanho de fonte de 18 pixels
+
+            if (mediaFinal >= 5) {
+                mensagem.innerHTML = "<p><span style='font-weight: bold; color: green;'>Parabéns! Você foi APROVADO na Disciplina</span></p>";
+                } 
+                else {
+                    var notaExame = (10 - mediaFinal).toFixed(2);
+                    mensagem.innerHTML = "<p><span style='font-weight: bold; color: red;'>Infelizmente, você não obteve média para passar na Disciplina, mas não desanime, estude para fazer o Exame e você irá conseguir! <br> <span style='font-weight: bold; color: blue;'>Você precisará tirar nota <span style='color: green; animation: blink 0.5s infinite;'>" + notaExame + "</span> no Exame para obter média 5,00 e ser APROVADO(A) na disciplina.</span></span></p>";
+
+                    }
+
+            return false; // Impede o formulário de ser enviado
+        }
+
+        function recarregarPagina() {
+            location.reload();
+        }
+        // Executar ações quando a página for carregada
+        window.onload = function() {
+        // Exibir o conteúdo principal
+            var conteudo = document.getElementById("conteudo");
+            conteudo.style.display = "block";
+
+        // Mostrar o popup se necessário
+        // mostrarPopup(event, 'media-avaliativas'); // Se quiser mostrar o popup automaticamente
+        };
+
+        
+    </script>
+
+<div class="botoes-tamanho">
+    <button onclick="alterarTamanhoFonte('P')">P</button><br>
+    <button onclick="alterarTamanhoFonte('M')">M</button><br>
+    <button onclick="alterarTamanhoFonte('G')">G</button>
+</div>
+
+
+
+</body>
+</html>
+
